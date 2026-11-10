@@ -3,13 +3,19 @@ import type { Session } from '@supabase/supabase-js'
 import { DEMO } from './config'
 import { start, stop, useApp } from './store'
 import { supabase } from './supabase'
+import { Book } from './ui/Book'
 import { Home } from './ui/Home'
 import { Login } from './ui/Login'
 import { Search } from './ui/Search'
 import { Settings } from './ui/Settings'
 import { Study } from './ui/Study'
 
-type Screen = { name: 'home' } | { name: 'study'; extra: number } | { name: 'settings' } | { name: 'search' }
+type Screen =
+  | { name: 'home' }
+  | { name: 'study'; extra: number }
+  | { name: 'settings' }
+  | { name: 'search' }
+  | { name: 'book'; focusId?: number; from: 'home' | 'search' }
 
 export function App() {
   const [session, setSession] = useState<Session | null | undefined>(DEMO ? null : undefined)
@@ -45,13 +51,16 @@ export function App() {
     case 'settings':
       return <Settings email={session?.user.email ?? (DEMO ? 'デモ' : '')} onBack={home} />
     case 'search':
-      return <Search onBack={home} />
+      return <Search onBack={home} onOpenBook={(focusId) => setScreen({ name: 'book', focusId, from: 'search' })} />
+    case 'book':
+      return <Book focusId={screen.focusId} onBack={screen.from === 'search' ? () => setScreen({ name: 'search' }) : home} />
     default:
       return (
         <Home
           onStudy={(extra) => setScreen({ name: 'study', extra })}
           onSettings={() => setScreen({ name: 'settings' })}
           onSearch={() => setScreen({ name: 'search' })}
+          onBook={() => setScreen({ name: 'book', from: 'home' })}
         />
       )
   }

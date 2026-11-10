@@ -736,3 +736,236 @@ input[type='date'] {
   margin: 2px 0;
   line-height: 1.6;
 }
+
+/* ---------- ホームの単語帳ボタン ---------- */
+.book-open {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  box-shadow: var(--shadow);
+}
+.book-open span {
+  display: grid;
+  text-align: left;
+}
+.book-open small {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+/* ---------- 単語帳 ---------- */
+.book-main {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 4px 14px calc(env(safe-area-inset-bottom) + 24px);
+}
+.jump {
+  background: var(--panel);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 14px;
+  margin-bottom: 16px;
+  display: grid;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--muted);
+}
+.jump-row {
+  display: flex;
+  gap: 8px;
+}
+.jump-row input {
+  flex: 1;
+  min-width: 0;
+  font: inherit;
+  font-size: 17px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: var(--bg);
+  color: var(--text);
+}
+.error.left {
+  text-align: left;
+  margin: 0;
+  font-size: 14px;
+}
+.level h2 {
+  font-size: 15px;
+  margin: 18px 4px 8px;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.level h2 small {
+  font-size: 13px;
+  color: var(--muted);
+  font-weight: 600;
+}
+.groups {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+.group-row {
+  width: 100%;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 4px 10px;
+  border: 0;
+  background: var(--panel);
+  box-shadow: var(--shadow);
+  border-radius: 14px;
+  padding: 12px 14px;
+  text-align: left;
+  cursor: pointer;
+}
+.group-name {
+  font-weight: 800;
+}
+.group-range {
+  font-size: 13px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.group-done {
+  font-size: 13px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.mini-bar {
+  grid-column: 1 / -1;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--unseen);
+  overflow: hidden;
+}
+.mini-bar span {
+  display: block;
+  height: 100%;
+  background: var(--ok);
+}
+.toggle.on {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--primary-text);
+}
+.group-sub {
+  margin: 4px 4px 10px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.entries {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+.entry {
+  background: var(--panel);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+  padding: 12px 14px;
+  scroll-margin: 80px;
+  transition: box-shadow 0.3s;
+}
+.entry.flash {
+  box-shadow: 0 0 0 3px var(--primary), var(--shadow);
+}
+.entry-head {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+.entry-no {
+  font-size: 12px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.entry-word {
+  font-weight: 800;
+  font-size: 19px;
+  overflow-wrap: anywhere;
+  flex: 1;
+}
+.tag {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.tag.mastered {
+  color: var(--ok);
+  background: color-mix(in srgb, var(--ok) 14%, transparent);
+}
+.tag.learning {
+  color: var(--warn);
+  background: color-mix(in srgb, var(--learning) 20%, transparent);
+}
+.entry-body {
+  margin-top: 8px;
+  display: grid;
+  gap: 6px;
+}
+.entry-mean {
+  display: flex;
+  gap: 8px;
+  font-size: 16px;
+  line-height: 1.5;
+}
+.entry-mean .pos {
+  width: 24px;
+  height: 24px;
+  font-size: 12px;
+}
+.entry-phrases {
+  list-style: none;
+  margin: 2px 0 0;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: var(--bg);
+  display: grid;
+  gap: 4px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.entry-phrases .en {
+  font-weight: 700;
+}
+.entry-phrases .ja {
+  color: var(--muted);
+}
+.entry-mask {
+  margin-top: 10px;
+  height: 22px;
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--ng) 22%, var(--line));
+}
+.group-nav {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 16px;
+}
+.group-nav .btn {
+  flex: 1;
+  max-width: 48%;
+}
+.open-book {
+  display: block;
+  margin: 0 14px 12px;
+}
+
+.group-hint {
+  display: block;
+  margin-top: 2px;
+}

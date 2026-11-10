@@ -2,11 +2,22 @@ import { useEffect, useState } from 'react'
 import { DEMO } from '../config'
 import { daysBetween, studyDay, todayCounts } from '../srs'
 import { syncNow, useApp } from '../store'
+import { lastBookGroup } from './Book'
 import { formatDay, SyncLine } from './common'
 
 const EXTRA_STEP = 20
 
-export function Home({ onStudy, onSettings, onSearch }: { onStudy: (extra: number) => void; onSettings: () => void; onSearch: () => void }) {
+export function Home({
+  onStudy,
+  onSettings,
+  onSearch,
+  onBook,
+}: {
+  onStudy: (extra: number) => void
+  onSettings: () => void
+  onSearch: () => void
+  onBook: () => void
+}) {
   const app = useApp()
   const today = useToday()
   const { due, relearn, plan } = todayCounts(app.wordIds, app.cards, today, app.settings.targetDay)
@@ -22,6 +33,7 @@ export function Home({ onStudy, onSettings, onSearch }: { onStudy: (extra: numbe
   const unseen = plan.unseen
   const pct = (n: number) => `${total ? (n / total) * 100 : 0}%`
   const targetLeft = daysBetween(today, app.settings.targetDay)
+  const bookGroup = lastBookGroup()
 
   return (
     <div className="screen home">
@@ -60,6 +72,14 @@ export function Home({ onStudy, onSettings, onSearch }: { onStudy: (extra: numbe
             </>
           )}
         </section>
+
+        <button className="btn big book-open" onClick={onBook}>
+          <BookIcon />
+          <span>
+            単語帳を見る
+            {bookGroup !== null && <small>GROUP {bookGroup} の続きから</small>}
+          </span>
+        </button>
 
         <section className="panel">
           <h2>全体の進み具合</h2>
@@ -128,6 +148,15 @@ function GearIcon() {
     <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <circle cx="12" cy="12" r="3" />
       <path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 0 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 0 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 0 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 0 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z" />
+    </svg>
+  )
+}
+
+function BookIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5z" />
+      <path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5" />
     </svg>
   )
 }

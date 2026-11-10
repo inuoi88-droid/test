@@ -5,7 +5,7 @@ import { Answer } from './common'
 
 const LIMIT = 50
 
-export function Search({ onBack }: { onBack: () => void }) {
+export function Search({ onBack, onOpenBook }: { onBack: () => void; onOpenBook: (id: number) => void }) {
   const app = useApp()
   const [q, setQ] = useState('')
   const [open, setOpen] = useState<number | null>(null)
@@ -51,7 +51,14 @@ export function Search({ onBack }: { onBack: () => void }) {
                   <span className="hit-word">{w.word}</span>
                   <StatusText card={app.cards.get(id)} />
                 </button>
-                {open === id && <Answer word={w} />}
+                {open === id && (
+                  <>
+                    <Answer word={w} />
+                    <button className="link open-book" onClick={() => onOpenBook(id)}>
+                      単語帳で見る（GROUP {w.grp}・No.{String(w.id).padStart(4, '0')}）
+                    </button>
+                  </>
+                )}
               </li>
             )
           })}

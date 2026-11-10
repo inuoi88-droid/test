@@ -62,6 +62,6 @@ export function Answer({ word }: { word: Word }) {
   )
 }
 
-function posClass(pos: string): string {
+export function posClass(pos: string): string {
   return { 名: 'n', 動: 'v', 形: 'a', 副: 'ad', 熟: 'ph' }[pos] ?? 'o'
 }
