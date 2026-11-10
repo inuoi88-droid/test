@@ -1,12 +1,25 @@
 import { useState, type FormEvent } from 'react'
 import { supabase } from '../supabase'
 
+/** 確認メールのリンクからエラー付きで戻ってきたとき（#error=...）の案内。読んだらアドレスから消す */
+function linkMessage(): { text: string; error?: boolean } | null {
+  if (typeof location === 'undefined' || !location.hash.includes('error')) return null
+  const p = new URLSearchParams(location.hash.slice(1))
+  const code = p.get('error_code') ?? p.get('error')
+  if (!code) return null
+  history.replaceState(null, '', location.pathname + location.search)
+  if (code === 'otp_expired') {
+    return { text: '確認メールのリンクは、すでに使われたか期限が切れています。確認が済んでいれば、そのままログインできます。ログインできないときは、もう一度アカウントを作ってください。' }
+  }
+  return { text: `確認メールのリンクを開けませんでした（${p.get('error_description') ?? code}）。まずはログインをお試しください。`, error: true }
+}
+
 export function Login() {
   const [mode, setMode] = useState<'login' | 'signup'>('login')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [busy, setBusy] = useState(false)
-  const [message, setMessage] = useState<{ text: string; error?: boolean } | null>(null)
+  const [message, setMessage] = useState<{ text: string; error?: boolean } | null>(linkMessage)
 
   async function submit(e: FormEvent) {
     e.preventDefault()
@@ -25,7 +38,7 @@ export function Login() {
         if (error) throw error
         if (!data.session) {
           setMessage({
-            text: '確認メールを送りました。メールのリンクを開いたあと（開いた先のページが表示されなくても確認は済みます）、この画面に戻ってログインしてください。',
+            text: '確認メールを送りました。メールのリンクを1回だけ開いてから、この画面に戻ってログインしてください。リンクを開いた先が「接続が拒否されました」などの表示になっても、確認は済んでいます。',
           })
           setMode('login')
         }

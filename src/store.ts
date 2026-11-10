@@ -132,7 +132,11 @@ async function refreshWords(force = false): Promise<void> {
   const have = await db.kvGet<string>('wordsVersion')
   if (!force && have === version) return
   if (version === '0' || version === '0-') {
-    throw new Error('単語を読めませんでした。このメールアドレスは利用者として登録されていないか、メールの確認がまだです。')
+    const { data } = await supabase.auth.getSession()
+    const email = data.session?.user.email
+    throw new Error(
+      `単語を読めませんでした。このメールアドレス${email ? `（${email}）` : ''}は利用者として登録されていないか、メールの確認がまだです。`,
+    )
   }
   set({ loadingText: '単語データを読み込み中…' })
   const all: Word[] = []
