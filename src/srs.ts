@@ -1,7 +1,7 @@
 // 学習の決まり（純粋関数。画面・保存・通信からは独立）
 //
 // - 初めて出た単語に一発で正解 → 卒業（もう出さない）
-// - 間違えた単語 → 同じ日のうちにもう一度出す（数えない）→ 1日後 → 3日後 → 7日後に復習
+// - 間違えた単語 → その回の最後にまとめてもう一周（数えない）→ 1日後 → 3日後 → 7日後に復習
 //   （間隔は前の復習からの日数）。復習で3回続けて正解 → 卒業。途中で間違えたら1日後からやり直し
 // - 1日の新出の数 = まだ出ていない語 ÷ 目標日までの残り日数（今日を含む）を切り上げ
 // - 1日の区切りは朝4時（深夜0時〜4時の学習は前の日に数える）
@@ -32,8 +32,6 @@ export const INTERVALS = [1, 3, 7] as const
 export const GRADUATE_STREAK = INTERVALS.length
 /** 1日の区切りの時刻 */
 export const DAY_START_HOUR = 4
-/** 間違えた単語を、何問あとにもう一度出すか */
-export const RELEARN_GAP = 6
 
 const pad = (n: number) => String(n).padStart(2, '0')
 
@@ -196,7 +194,8 @@ export function todayCounts(wordIds: readonly number[], cards: ReadonlyMap<numbe
 }
 
 /**
- * 今日出す問題の並び。復習（予定日の古い順）→ 今日間違えたもの → 新出（本の順）。
+ * 今日出す問題の並び（まとめの一周の前まで）。復習（予定日の古い順）→ 新出（本の順）。
+ * 今日間違えた単語は入れず、最後に relearnQueue() でまとめて出す。
  * extraNew は「今日の分のあとにさらに進める」語数。
  */
 export function buildQueue(
@@ -207,13 +206,10 @@ export function buildQueue(
   extraNew = 0,
 ): number[] {
   const due: Card[] = []
-  const relearn: Card[] = []
   for (const c of cards.values()) {
-    if (needsRelearn(c, today)) relearn.push(c)
-    else if (isDue(c, today)) due.push(c)
+    if (!needsRelearn(c, today) && isDue(c, today)) due.push(c)
   }
   due.sort((a, b) => (a.due! < b.due! ? -1 : a.due! > b.due! ? 1 : a.word_id - b.word_id))
-  relearn.sort((a, b) => a.updated_at - b.updated_at)
 
   const plan = dailyPlan(wordIds.length, cards.values(), today, targetDay)
   const want = plan.newLeft + extraNew
@@ -222,15 +218,15 @@ export function buildQueue(
     if (fresh.length >= want) break
     if (isUnseen(cards.get(id))) fresh.push(id)
   }
-  return [...due.map((c) => c.word_id), ...relearn.map((c) => c.word_id), ...fresh]
+  return [...due.map((c) => c.word_id), ...fresh]
 }
 
-/** 間違えた問題を、少しあとにもう一度入れる（queue[pos] が今答えた問題） */
-export function reinsert(queue: readonly number[], pos: number, wordId: number, gap = RELEARN_GAP): number[] {
-  const q = queue.slice()
-  const at = Math.min(pos + 1 + gap, q.length)
-  q.splice(at, 0, wordId)
-  return q
+/** まとめの一周：今日間違えたまま、まだ正解していない単語（間違えた順） */
+export function relearnQueue(cards: ReadonlyMap<number, Card>, today: string): number[] {
+  const list: Card[] = []
+  for (const c of cards.values()) if (needsRelearn(c, today)) list.push(c)
+  list.sort((a, b) => a.updated_at - b.updated_at || a.word_id - b.word_id)
+  return list.map((c) => c.word_id)
 }
 
 /** 端末どうしの記録を合わせる：新しい方 */

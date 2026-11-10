@@ -50,7 +50,10 @@ export function Settings({ email, onBack }: { email: string; onBack: () => void 
           <ul className="rules">
             <li>はじめて出た単語に一発で正解すると、もう出ません。</li>
             <li>
-              間違えた単語は、その日のうちにもう一度出たあと、{INTERVALS[0]}日後 → {INTERVALS[1]}日後 → {INTERVALS[2]}日後に復習で出ます（間隔は前の復習から数えます）。
+              間違えた単語は、その回の最後に「まとめの一周」でまとめてもう一度出ます（回数には数えません）。それでも間違えた単語は一覧で表示します。
+            </li>
+            <li>
+              そのあと {INTERVALS[0]}日後 → {INTERVALS[1]}日後 → {INTERVALS[2]}日後に復習で出ます（間隔は前の復習から数えます）。
             </li>
             <li>復習で{INTERVALS.length}回続けて正解すると、もう出ません。途中で間違えたら{INTERVALS[0]}日後からやり直しです。</li>
             <li>1日の区切りは朝{DAY_START_HOUR}時です。</li>

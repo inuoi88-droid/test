@@ -583,11 +583,13 @@ input[type='date'] {
 
 .finished {
   flex: 1;
+  min-height: 0;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: safe center;
   gap: 8px;
-  padding: 20px;
+  padding: 20px 20px calc(env(safe-area-inset-bottom) + 20px);
   text-align: center;
 }
 .finished h2 {
@@ -669,4 +671,68 @@ input[type='date'] {
 }
 .hit-status.learning {
   color: var(--warn);
+}
+
+/* ---------- まとめの一周でも間違えた単語 ---------- */
+.fail-list {
+  text-align: left;
+  margin-top: 8px;
+  background: var(--panel);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 14px 14px 8px;
+}
+.fail-list h3 {
+  margin: 0 0 8px;
+  font-size: 15px;
+  color: var(--ng);
+}
+.fail-list > ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.fail-list > ul > li + li {
+  border-top: 1px solid var(--line);
+}
+.fail-item {
+  width: 100%;
+  border: 0;
+  background: none;
+  text-align: left;
+  padding: 10px 2px;
+  display: grid;
+  gap: 2px;
+  cursor: pointer;
+}
+.fail-word {
+  font-weight: 800;
+  font-size: 17px;
+}
+.fail-mean {
+  font-size: 14px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+.fail-phrases {
+  list-style: none;
+  margin: 0 0 10px;
+  padding: 0 2px;
+  display: grid;
+  gap: 4px;
+  font-size: 14px;
+}
+.fail-phrases .en {
+  font-weight: 700;
+}
+.fail-phrases .ja {
+  color: var(--muted);
+}
+.small-note {
+  font-size: 13px;
+  margin: 8px 0 4px;
+}
+.finished > p {
+  margin: 2px 0;
+  line-height: 1.6;
 }

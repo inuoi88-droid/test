@@ -8,7 +8,7 @@ import {
   isDue,
   kindOf,
   needsRelearn,
-  reinsert,
+  relearnQueue,
   studyDay,
   type Card,
 } from '../src/srs'
@@ -141,20 +141,21 @@ describe('1日の新出の数', () => {
 })
 
 describe('今日の問題の並び', () => {
-  it('復習（予定日の古い順）→ 今日間違えたもの → 新出（本の順）', () => {
+  it('復習（予定日の古い順）→ 新出（本の順）。今日間違えたものは入れない', () => {
     const today = '2026-11-12'
     const cards = mapOf([
       answer(undefined, 5, false, '2026-11-11', 1), // 予定 11/12
       answer(undefined, 3, false, '2026-11-10', 2), // 予定 11/11（遅れ）
-      answer(undefined, 9, false, today, 3), // 今日間違えた
+      answer(undefined, 9, false, today, 3), // 今日間違えた → まとめの一周へ
       answer(undefined, 1, true, '2026-11-10', 4), // 卒業
     ])
     const q = buildQueue(ids(20), cards, today, today)
-    expect(q.slice(0, 3)).toEqual([3, 5, 9])
-    expect(q.slice(3, 6)).toEqual([2, 4, 6])
+    expect(q.slice(0, 2)).toEqual([3, 5])
+    expect(q.slice(2, 5)).toEqual([2, 4, 6])
     expect(q).not.toContain(1)
-    // 新出：残り 20 − 4 = 16 + 今日の1 = 17（目標日が今日なので全部）
-    expect(q.length).toBe(3 + 16)
+    expect(q).not.toContain(9)
+    // 新出：まだ出ていない16語（目標日が今日なので全部）
+    expect(q.length).toBe(2 + 16)
   })
 
   it('今日の分が終わったら新出は出ない。先取りすると出る', () => {
@@ -163,9 +164,25 @@ describe('今日の問題の並び', () => {
     expect(buildQueue(ids(100), cards, today, '2026-11-19')).toEqual([])
     expect(buildQueue(ids(100), cards, today, '2026-11-19', 3)).toEqual([11, 12, 13])
   })
+})
 
-  it('間違えた問題は少しあとにもう一度', () => {
-    expect(reinsert([1, 2, 3, 4, 5, 6, 7, 8, 9], 0, 1, 3)).toEqual([1, 2, 3, 4, 1, 5, 6, 7, 8, 9])
-    expect(reinsert([1, 2], 1, 2, 6)).toEqual([1, 2, 2])
+describe('まとめの一周', () => {
+  const today = '2026-11-10'
+  it('今日間違えた単語を、間違えた順に全部', () => {
+    let cards = mapOf([
+      answer(undefined, 7, false, today, 300),
+      answer(undefined, 2, false, today, 100),
+      answer(undefined, 4, true, today, 200),
+      answer(undefined, 9, false, '2026-11-09', 50), // 前の日に間違えた → 今日はふつうの復習
+    ])
+    expect(relearnQueue(cards, today)).toEqual([2, 7])
+    // まとめの一周で正解したら外れ、また間違えたら残る（予定日は翌日のまま）
+    const c2 = answer(cards.get(2), 2, true, today, 400)
+    const c7 = answer(cards.get(7), 7, false, today, 500)
+    cards = new Map(cards).set(2, c2).set(7, c7)
+    expect(relearnQueue(cards, today)).toEqual([7])
+    expect(c7.due).toBe('2026-11-11')
+    expect(c7.streak).toBe(0)
+    expect(c2.due).toBe('2026-11-11')
   })
 })
